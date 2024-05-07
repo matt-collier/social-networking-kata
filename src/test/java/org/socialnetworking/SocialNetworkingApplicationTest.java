@@ -54,4 +54,28 @@ class SocialNetworkingApplicationTest {
         "Some interesting things have happened", "Eh?");
         }
     }
+
+    @Test
+    void shouldBeAbleToFollowOtherUsersAndDisplayTheirPostsOnWall() throws IOException {
+        final Repository repository = new Repository();
+        repository.addToTimeline("Alice", "I love the weather today");
+        repository.addToTimeline("Charlie", "I'm in New York today! Anyone wants to have a coffee?");
+
+
+
+        var input = """
+                Charlie follows Alice
+                Charlie wall
+                Q
+                """;
+        try (ByteArrayOutputStream output = new ByteArrayOutputStream();
+             PrintStream printStream = new PrintStream(output);
+             ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes())) {
+
+            new ApplicationRunner(new ConsoleReader(inputStream), new ConsoleWriter(printStream), repository).runApplication();
+
+            assertThat(output.toString().split(System.lineSeparator())).containsExactly(
+                    "Charlie - I'm in New York today! Anyone wants to have a coffee?", "Alice - I love the weather today");
+        }
+    }
 }

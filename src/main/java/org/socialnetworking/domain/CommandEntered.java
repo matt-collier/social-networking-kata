@@ -3,7 +3,9 @@ package org.socialnetworking.domain;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public interface CommandEntered {
+import static org.socialnetworking.domain.CommandEntered.*;
+
+public sealed interface CommandEntered permits Follows, Post, Read, Wall {
 
     Pattern POST = Pattern.compile("(.*) -> (.*)");
     Pattern READ = Pattern.compile("^\\s*(\\S+)\\s*$");
@@ -24,6 +26,10 @@ public interface CommandEntered {
         if (followerMatcher.find()) {
             return new Follows(followerMatcher.group(1), followerMatcher.group(2));
         }
+        final Matcher wallMatcher = WALL.matcher(input);
+        if (wallMatcher.find()) {
+            return new Wall(wallMatcher.group(1));
+        }
         throw new UnsupportedOperationException("Command %s not supported".formatted(input));
     }
 
@@ -36,6 +42,6 @@ public interface CommandEntered {
     record Follows(String subscriber, String target) implements CommandEntered {
     }
 
-    record Wall(User user) implements CommandEntered {
+    record Wall(String user) implements CommandEntered {
     }
 }

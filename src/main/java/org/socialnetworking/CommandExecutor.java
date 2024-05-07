@@ -20,8 +20,13 @@ public class CommandExecutor {
             case Post postCommand -> addToTimeline(postCommand);
             case Read readCommand -> readTimeline(readCommand);
             case Wall wallCommand -> wall(wallCommand);
+            case Follows followCommand -> follow(followCommand);
             default -> throw new IllegalStateException("Unexpected value: " + commandEntered);
         };
+    }
+
+    private OutputMessage follow(final Follows followCommand) {
+        return repository.follows(followCommand.subscriber(), followCommand.target());
     }
 
     private OutputMessage wall(final Wall wallCommand) {

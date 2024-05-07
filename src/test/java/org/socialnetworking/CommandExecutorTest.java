@@ -29,12 +29,13 @@ class CommandExecutorTest {
     }
 
     @Test
-    void shouldBeAbleToViewWall() {
+    void shouldBeAbleToFollowAndSeeSubscriptionPostsOnWall() {
         repository.addToTimeline("Alice", "I love the weather today");
         repository.addToTimeline("Charlie", "I'm in New York today! Anyone wants to have a coffee?");
 
-        final User charlie = new User("Charlie", Set.of("Alice"));
-        final var outputMessage = commandExecutor.execute(new CommandEntered.Wall(charlie));
+        commandExecutor.execute(new CommandEntered.Follows("Charlie", "Alice"));
+
+        final var outputMessage = commandExecutor.execute(new CommandEntered.Wall("Charlie"));
         assertThat(outputMessage.lines()).containsExactly("Charlie - I'm in New York today! Anyone wants to have a coffee?", "Alice - I love the weather today");
     }
 }
