@@ -1,6 +1,10 @@
 package org.socialnetworking.console;
 
+import org.socialnetworking.CommandExecutor;
 import org.socialnetworking.Repository;
+
+import java.time.Clock;
+import java.time.Instant;
 
 public class SocialNetworkingApplication {
 
@@ -12,7 +16,7 @@ public class SocialNetworkingApplication {
             var appRunner = new ApplicationRunner(
                     consoleReader,
                     consoleWriter,
-                    new Repository());
+                    new CommandExecutor(new Repository(), (() -> Instant.now(Clock.systemUTC()))));
 
             appRunner.runApplication();
         } catch (Exception e) {

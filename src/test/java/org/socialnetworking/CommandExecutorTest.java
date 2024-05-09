@@ -2,16 +2,22 @@ package org.socialnetworking;
 
 import org.junit.jupiter.api.Test;
 import org.socialnetworking.domain.CommandEntered;
-import org.socialnetworking.domain.User;
+import org.socialnetworking.domain.Posted;
 
-import java.util.Set;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CommandExecutorTest {
 
+    private static final Instant NOW = LocalDateTime.of(2024, 5, 4, 11, 12, 20).toInstant(ZoneOffset.UTC);
+    private static final Instant FIVE_MINUTES_AGO = LocalDateTime.of(2024, 5, 4, 11, 7, 20).toInstant(ZoneOffset.UTC);
+    private static final Instant TWO_SECONDS_AGO = LocalDateTime.of(2024, 5, 4, 11, 12, 18).toInstant(ZoneOffset.UTC);
+
     private final Repository repository = new Repository();
-    private final CommandExecutor commandExecutor = new CommandExecutor(repository);
+    private CommandExecutor commandExecutor = new CommandExecutor(repository, () -> NOW);
 
     @Test
     void shouldPostMessagesToTimeline() {
@@ -22,20 +28,21 @@ class CommandExecutorTest {
 
     @Test
     void shouldReadTimeline() {
-        repository.addToTimeline("Bob", "Hi, Bob here");
-        repository.addToTimeline("Bob", "Whats going on?");
+        repository.addToTimeline(new Posted("Bob", "Hi, Bob here", NOW));
+        repository.addToTimeline(new Posted("Bob", "Whats going on?", NOW));
         final var outputMessage = commandExecutor.execute(new CommandEntered.Read("Bob"));
         assertThat(outputMessage.lines()).containsExactly("Hi, Bob here", "Whats going on?");
     }
 
     @Test
     void shouldBeAbleToFollowAndSeeSubscriptionPostsOnWall() {
-        repository.addToTimeline("Alice", "I love the weather today");
-        repository.addToTimeline("Charlie", "I'm in New York today! Anyone wants to have a coffee?");
+        repository.addToTimeline(new Posted("Alice", "I love the weather today", FIVE_MINUTES_AGO));
+        repository.addToTimeline(new Posted("Charlie", "I'm in New York today! Anyone wants to have a coffee?", TWO_SECONDS_AGO));
 
         commandExecutor.execute(new CommandEntered.Follows("Charlie", "Alice"));
 
         final var outputMessage = commandExecutor.execute(new CommandEntered.Wall("Charlie"));
-        assertThat(outputMessage.lines()).containsExactly("Charlie - I'm in New York today! Anyone wants to have a coffee?", "Alice - I love the weather today");
+        assertThat(outputMessage.lines()).containsExactly("Charlie - I'm in New York today! Anyone wants to have a coffee? (2 seconds ago)", "Alice - I love the weather today (5 minutes ago)");
+
     }
 }

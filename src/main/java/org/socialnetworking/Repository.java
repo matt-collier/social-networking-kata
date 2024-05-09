@@ -10,11 +10,11 @@ public class Repository {
     private final Map<String, List<Posted>> postMap = new HashMap<>();
     private Map<String, Set<String>> subscriptions = new HashMap<>();
 
-    public void addToTimeline(final String userName, final String message) {
-        if(postMap.containsKey(userName)) {
-            postMap.get(userName).add(new Posted(userName, message));
+    public void addToTimeline(final Posted posted) {
+        if(postMap.containsKey(posted.userName())) {
+            postMap.get(posted.userName()).add(posted);
         } else {
-            postMap.put(userName, new ArrayList<>(List.of(new Posted(userName, message))));
+            postMap.put(posted.userName(), new ArrayList<>(List.of(posted)));
         }
     }
 

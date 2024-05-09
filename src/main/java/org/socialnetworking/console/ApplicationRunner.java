@@ -1,21 +1,20 @@
 package org.socialnetworking.console;
 
 import org.socialnetworking.CommandExecutor;
-import org.socialnetworking.Repository;
 import org.socialnetworking.domain.CommandEntered;
 import org.socialnetworking.domain.OutputMessage;
 
 public class ApplicationRunner {
 
-    private final ConsoleReader consoleReader;
-    private final ConsoleWriter consoleWriter;
-    private final CommandExecutor commandExecutor;
+    private ConsoleReader consoleReader;
+    private ConsoleWriter consoleWriter;
+    private CommandExecutor commandExecutor;
 
 
-    public ApplicationRunner(final ConsoleReader consoleReader, final ConsoleWriter consoleWriter, final Repository repository) {
+    public ApplicationRunner(ConsoleReader consoleReader, ConsoleWriter consoleWriter, CommandExecutor commandExecutor) {
         this.consoleReader = consoleReader;
         this.consoleWriter = consoleWriter;
-        this.commandExecutor = new CommandExecutor(repository);
+        this.commandExecutor = commandExecutor;
     }
 
     public void runApplication() {
@@ -29,11 +28,11 @@ public class ApplicationRunner {
         return consoleReader.readLine();
     }
 
-    private boolean isNotQuit(final String input) {
+    private boolean isNotQuit(String input) {
         return !input.equalsIgnoreCase("Q");
     }
 
-    private void writeOutput(final OutputMessage outputMessage) {
+    private void writeOutput(OutputMessage outputMessage) {
         outputMessage.lines().forEach(consoleWriter::writeLine);
     }
 }
