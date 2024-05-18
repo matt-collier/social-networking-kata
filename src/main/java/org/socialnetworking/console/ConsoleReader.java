@@ -7,7 +7,7 @@ public class ConsoleReader implements AutoCloseable {
 
     private final Scanner scanner;
 
-    public ConsoleReader(final InputStream inputStream) {
+    public ConsoleReader(InputStream inputStream) {
         scanner = new Scanner(inputStream);
     }
 

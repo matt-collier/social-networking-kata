@@ -18,7 +18,7 @@ public class CommandParser {
             new CommandMapping(FOLLOWING, CommandParser::following),
             new CommandMapping(WALL, CommandParser::wall));
 
-    public static CommandEntered commandFor(final String input) {
+    public static CommandEntered commandFor(String input) {
         return commandMappings.stream()
                 .map(commandParser -> commandParser.commandEntered(input))
                 .filter(Optional::isPresent)

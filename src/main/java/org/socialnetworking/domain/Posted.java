@@ -1,4 +1,6 @@
 package org.socialnetworking.domain;
 
-public record Posted(String userName, String message, java.time.Instant timestamp) {
+import java.time.Instant;
+
+public record Posted(String userName, String message, Instant timestamp) {
 }
