@@ -14,6 +14,7 @@ import java.io.PrintStream;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,24 +24,20 @@ class SocialNetworkingApplicationTest {
     private static final Instant TWO_SECONDS_AGO = LocalDateTime.of(2024, 5, 4, 11, 12, 18).toInstant(ZoneOffset.UTC);
 
     private final Repository repository = new Repository();
-    private CommandExecutor commandExecutor = new CommandExecutor(repository, () -> NOW);
+    private final CommandExecutor commandExecutor = new CommandExecutor(repository, () -> NOW);
+
+    private String input;
 
     @Test
-    void shouldBeAbleToPostMessages() throws IOException {
-        var input = """
+    void shouldBeAbleToPostMessagesAndReadThemInUsersTimeline() throws IOException {
+        givenInput("""
                 Alice -> I love the weather today
                 Alice -> Its a beautiful summers day
                 Alice
                 Q
-                """;
-        try (ByteArrayOutputStream output = new ByteArrayOutputStream();
-             PrintStream printStream = new PrintStream(output);
-             ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes())) {
+                """);
 
-            new ApplicationRunner(new ConsoleReader(inputStream), new ConsoleWriter(printStream), commandExecutor).runApplication();
-
-            assertThat(output.toString()).contains("I love the weather today", "Its a beautiful summers day");
-        }
+        whenInputProcessed(output -> assertThat(output).contains("I love the weather today", "Its a beautiful summers day"));
     }
 
     @Test
@@ -50,40 +47,43 @@ class SocialNetworkingApplicationTest {
         commandExecutor.execute(new CommandEntered.Post("Alice", "Hello, is it me your looking for"));
         commandExecutor.execute(new CommandEntered.Post("Bob", "Eh?"));
 
-        var input = """
+        givenInput("""
                 Bob
                 Q
-                """;
-        try (ByteArrayOutputStream output = new ByteArrayOutputStream();
-             PrintStream printStream = new PrintStream(output);
-             ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes())) {
+                """);
 
-            new ApplicationRunner(new ConsoleReader(inputStream), new ConsoleWriter(printStream), commandExecutor).runApplication();
-
-            assertThat(output.toString().split(System.lineSeparator())).containsExactly(
-        "Some interesting things have happened", "Eh?");
-        }
+        whenInputProcessed(output -> assertThat(output.split(System.lineSeparator())).containsExactly(
+                "Some interesting things have happened", "Eh?"));
     }
 
     @Test
     void shouldBeAbleToFollowOtherUsersAndDisplayTheirPostsOnWall() throws IOException {
-
         repository.addToTimeline(new Posted("Alice", "I love the weather today", FIVE_MINUTES_AGO));
         repository.addToTimeline(new Posted("Charlie", "I'm in New York today! Anyone wants to have a coffee?", TWO_SECONDS_AGO));
 
-        var input = """
+        givenInput("""
                 Charlie follows Alice
                 Charlie wall
                 Q
-                """;
+                """);
+        whenInputProcessed(output -> assertThat(output.split(System.lineSeparator())).containsExactly(
+                "Charlie - I'm in New York today! Anyone wants to have a coffee? (2 seconds ago)", "Alice - I love the weather today (5 minutes ago)"));
+    }
+
+    private void givenInput(final String input) {
+        this.input = input;
+    }
+
+    private void whenInputProcessed(Consumer<String> assertion) throws IOException {
         try (ByteArrayOutputStream output = new ByteArrayOutputStream();
              PrintStream printStream = new PrintStream(output);
              ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes())) {
 
-            new ApplicationRunner(new ConsoleReader(inputStream), new ConsoleWriter(printStream), commandExecutor).runApplication();
+            var applicationRunner = new ApplicationRunner(new ConsoleReader(inputStream), new ConsoleWriter(printStream), commandExecutor);
 
-            assertThat(output.toString().split(System.lineSeparator())).containsExactly(
-                    "Charlie - I'm in New York today! Anyone wants to have a coffee? (2 seconds ago)", "Alice - I love the weather today (5 minutes ago)");
+            applicationRunner.runApplication();
+
+            assertion.accept(output.toString());
         }
     }
 }
