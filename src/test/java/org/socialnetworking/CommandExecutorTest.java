@@ -23,7 +23,7 @@ class CommandExecutorTest {
     void shouldPostMessagesToTimeline() {
         final var outputMessage = commandExecutor.execute(new CommandEntered.Post("Alice", "In wonderland again"));
         assertThat(outputMessage.lines()).isEmpty();
-        assertThat(repository.fetchTimeline("Alice")).containsExactly("In wonderland again");
+        assertThat(repository.fetchTimeline("Alice").messages()).containsExactly("In wonderland again");
     }
 
     @Test

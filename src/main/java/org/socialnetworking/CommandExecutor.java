@@ -67,7 +67,7 @@ public class CommandExecutor {
     }
 
     private OutputMessage readTimeline(Read read) {
-        return new OutputMessage(repository.fetchTimeline(read.userName()));
+        return new OutputMessage(repository.fetchTimeline(read.userName()).messages());
     }
 
 }

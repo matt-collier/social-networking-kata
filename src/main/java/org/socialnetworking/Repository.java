@@ -1,6 +1,7 @@
 package org.socialnetworking;
 
 import org.socialnetworking.domain.Posted;
+import org.socialnetworking.domain.Timeline;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -17,8 +18,8 @@ public class Repository {
         }
     }
 
-    public List<String> fetchTimeline(String userName) {
-        return userPosts(userName).map(Posted::message).toList();
+    public Timeline fetchTimeline(String userName) {
+        return new Timeline(userPosts(userName).map(Posted::message).toList());
     }
 
 

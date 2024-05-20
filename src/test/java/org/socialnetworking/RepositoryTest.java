@@ -19,13 +19,13 @@ class RepositoryTest {
     @Test
     void shouldBeAbleToPublishMessageToTimeline() {
         repository.addToTimeline(new Posted("Alice", "Hello World", NOW));
-        assertThat(repository.fetchTimeline("Alice")).contains("Hello World");
+        assertThat(repository.fetchTimeline("Alice").messages()).contains("Hello World");
     }
 
     @Test
     void shouldBeAbleToPublishAnotherMessageToTimeline() {
         repository.addToTimeline(new Posted("Bob", "Something else", NOW));
-        assertThat(repository.fetchTimeline("Bob")).contains("Something else");
+        assertThat(repository.fetchTimeline("Bob").messages()).contains("Something else");
     }
 
 
