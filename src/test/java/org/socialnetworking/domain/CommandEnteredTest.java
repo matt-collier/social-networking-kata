@@ -24,4 +24,10 @@ class CommandEnteredTest {
         assertThat(CommandParser.commandFor("Charlie follows Alice")).isEqualTo(new CommandEntered.Follows("Charlie", "Alice"));
         assertThat(CommandParser.commandFor("Charlie follows Bob")).isEqualTo(new CommandEntered.Follows("Charlie", "Bob"));
     }
+
+    @Test
+    void shouldRecogniseWallCommand() {
+        assertThat(CommandParser.commandFor("Charlie wall")).isEqualTo(new CommandEntered.Wall("Charlie"));
+        assertThat(CommandParser.commandFor("Bob wall")).isEqualTo(new CommandEntered.Wall( "Bob"));
+    }
 }
