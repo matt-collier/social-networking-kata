@@ -6,6 +6,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.socialnetworking.domain.CommandEntered.*;
+
 public class CommandParser {
     private static final Pattern POST = Pattern.compile("(.*) -> (.*)");
     private static final Pattern READ = Pattern.compile("^\\s*(\\S+)\\s*$");
@@ -29,19 +31,19 @@ public class CommandParser {
 
 
     private static CommandEntered post(Matcher matcher) {
-        return new CommandEntered.Post(matcher.group(1), matcher.group(2));
+        return new PostCommand(matcher.group(1), matcher.group(2));
     }
 
     private static CommandEntered read(Matcher matcher) {
-        return new CommandEntered.Read(matcher.group(0));
+        return new ReadCommand(matcher.group(0));
     }
 
     private static CommandEntered following(Matcher matcher) {
-        return new CommandEntered.Follows(matcher.group(1), matcher.group(2));
+        return new FollowCommand(matcher.group(1), matcher.group(2));
     }
 
     private static CommandEntered wall(Matcher matcher) {
-        return new CommandEntered.Wall(matcher.group(1));
+        return new WallCommand(matcher.group(1));
     }
 }
 

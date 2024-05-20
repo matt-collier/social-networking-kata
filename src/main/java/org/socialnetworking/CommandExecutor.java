@@ -26,19 +26,19 @@ public class CommandExecutor {
 
     public OutputMessage execute(CommandEntered commandEntered) {
         return switch(commandEntered) {
-            case Post postCommand -> addToTimeline(postCommand);
-            case Read readCommand -> readTimeline(readCommand);
-            case Wall wallCommand -> wall(wallCommand);
-            case Follows followCommand -> follow(followCommand);
+            case PostCommand postCommand -> addToTimeline(postCommand);
+            case ReadCommand readCommand -> readTimeline(readCommand);
+            case WallCommand wallCommand -> wall(wallCommand);
+            case FollowCommand followCommand -> follow(followCommand);
         };
     }
 
-    private OutputMessage follow(Follows followCommand) {
+    private OutputMessage follow(FollowCommand followCommand) {
         repository.follows(followCommand.subscriber(), followCommand.target());
         return new OutputMessage(List.of());
     }
 
-    private OutputMessage wall(Wall wallCommand) {
+    private OutputMessage wall(WallCommand wallCommand) {
         List<String> wall = repository.wallFor(wallCommand.user())
                 .stream()
                 .sorted(comparing(Posted::timestamp).reversed())
@@ -61,13 +61,13 @@ public class CommandExecutor {
         };
     }
 
-    private OutputMessage addToTimeline(Post post) {
-        repository.addToTimeline(new Posted(post.userName(), post.message(), eventTimeSupplier.get()));
+    private OutputMessage addToTimeline(PostCommand postCommand) {
+        repository.addToTimeline(new Posted(postCommand.userName(), postCommand.message(), eventTimeSupplier.get()));
         return new OutputMessage(List.of());
     }
 
-    private OutputMessage readTimeline(Read read) {
-        return new OutputMessage(repository.fetchTimeline(read.userName()).messages());
+    private OutputMessage readTimeline(ReadCommand readCommand) {
+        return new OutputMessage(repository.fetchTimeline(readCommand.userName()).messages());
     }
 
 }

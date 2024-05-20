@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.socialnetworking.console.ApplicationRunner;
 import org.socialnetworking.console.ConsoleReader;
 import org.socialnetworking.console.ConsoleWriter;
-import org.socialnetworking.domain.CommandEntered;
 import org.socialnetworking.domain.Posted;
 
 import java.io.ByteArrayInputStream;
@@ -17,6 +16,7 @@ import java.time.ZoneOffset;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.socialnetworking.domain.CommandEntered.*;
 
 class SocialNetworkingApplicationTest {
     private static final Instant NOW = LocalDateTime.of(2024, 5, 4, 11, 12, 20).toInstant(ZoneOffset.UTC);
@@ -45,10 +45,10 @@ class SocialNetworkingApplicationTest {
 
     @Test
     void shouldBeAbleToReadUsersTimeline() throws IOException {
-        commandExecutor.execute(new CommandEntered.Post("Alice", "Well, what is going on?"));
-        commandExecutor.execute(new CommandEntered.Post("Bob", "Some interesting things have happened"));
-        commandExecutor.execute(new CommandEntered.Post("Alice", "Hello, is it me your looking for"));
-        commandExecutor.execute(new CommandEntered.Post("Bob", "Eh?"));
+        commandExecutor.execute(new PostCommand("Alice", "Well, what is going on?"));
+        commandExecutor.execute(new PostCommand("Bob", "Some interesting things have happened"));
+        commandExecutor.execute(new PostCommand("Alice", "Hello, is it me your looking for"));
+        commandExecutor.execute(new PostCommand("Bob", "Eh?"));
 
         givenInput("""
                 Bob
