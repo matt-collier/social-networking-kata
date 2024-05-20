@@ -1,6 +1,5 @@
 package org.socialnetworking;
 
-import org.socialnetworking.domain.OutputMessage;
 import org.socialnetworking.domain.Posted;
 
 import java.util.*;
@@ -37,12 +36,11 @@ public class Repository {
         return postMap.get(userName).stream();
     }
 
-    public OutputMessage follows(String subscriber, final String target) {
+    public void follows(String subscriber, final String target) {
         if(subscriptions.containsKey(subscriber)) {
             subscriptions.get(subscriber).add(target);
         } else {
             subscriptions.put(subscriber, new HashSet<>(Set.of(target)));
         }
-        return new OutputMessage(List.of());
     }
 }

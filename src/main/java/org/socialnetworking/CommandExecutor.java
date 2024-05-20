@@ -34,7 +34,8 @@ public class CommandExecutor {
     }
 
     private OutputMessage follow(Follows followCommand) {
-        return repository.follows(followCommand.subscriber(), followCommand.target());
+        repository.follows(followCommand.subscriber(), followCommand.target());
+        return new OutputMessage(List.of());
     }
 
     private OutputMessage wall(Wall wallCommand) {
