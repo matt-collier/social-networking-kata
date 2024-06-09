@@ -2,9 +2,12 @@ package org.socialnetworking;
 
 import org.socialnetworking.domain.Posted;
 import org.socialnetworking.domain.Timeline;
+import org.socialnetworking.domain.Wall;
 
 import java.util.*;
 import java.util.stream.Stream;
+
+import static java.util.Comparator.comparing;
 
 public class Repository {
     private final Map<String, List<Posted>> postMap = new HashMap<>();
@@ -23,10 +26,11 @@ public class Repository {
     }
 
 
-    public List<Posted> wallFor(String user) {
-        return Stream.concat(userPosts(user),
+    public Wall wallFor(String user) {
+        return new Wall(Stream.concat(userPosts(user),
                              subscriptionPosts(subscriptions.get(user)))
-                .toList();
+                .sorted(comparing(Posted::timestamp).reversed())
+                .toList());
     }
 
     private Stream<Posted> subscriptionPosts(Set<String> subscriptions) {

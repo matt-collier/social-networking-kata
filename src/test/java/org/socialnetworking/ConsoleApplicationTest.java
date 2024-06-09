@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.socialnetworking.domain.CommandEntered.*;
 
-class SocialNetworkingApplicationTest {
+class ConsoleApplicationTest {
     private static final Instant NOW = LocalDateTime.of(2024, 5, 4, 11, 12, 20).toInstant(ZoneOffset.UTC);
     private static final Instant FIVE_MINUTES_AGO = LocalDateTime.of(2024, 5, 4, 11, 7, 20).toInstant(ZoneOffset.UTC);
     private static final Instant TWO_MINUTES_AGO = LocalDateTime.of(2024, 5, 4, 11, 10, 20).toInstant(ZoneOffset.UTC);
@@ -103,7 +103,7 @@ class SocialNetworkingApplicationTest {
              PrintStream printStream = new PrintStream(output);
              ByteArrayInputStream inputStream = new ByteArrayInputStream(input.getBytes())) {
 
-            var applicationRunner = new ApplicationRunner(new ConsoleReader(inputStream), new ConsoleWriter(printStream), commandExecutor);
+            var applicationRunner = new ApplicationRunner(new ConsoleReader(inputStream), new ConsoleWriter(printStream), commandExecutor, () -> NOW);
 
             applicationRunner.runApplication();
 

@@ -1,27 +1,40 @@
 package org.socialnetworking.console;
 
 import org.socialnetworking.CommandExecutor;
-import org.socialnetworking.domain.CommandParser;
-import org.socialnetworking.domain.OutputMessage;
+import org.socialnetworking.domain.*;
+
+import java.time.Instant;
+import java.util.function.Supplier;
 
 public class ApplicationRunner {
 
     private final ConsoleReader consoleReader;
     private final ConsoleWriter consoleWriter;
     private final CommandExecutor commandExecutor;
+    private final Supplier<Instant> eventTimeSupplier;
 
 
-    public ApplicationRunner(ConsoleReader consoleReader, ConsoleWriter consoleWriter, CommandExecutor commandExecutor) {
+
+    public ApplicationRunner(ConsoleReader consoleReader, ConsoleWriter consoleWriter, CommandExecutor commandExecutor, final Supplier<Instant> eventTimeSupplier) {
         this.consoleReader = consoleReader;
         this.consoleWriter = consoleWriter;
         this.commandExecutor = commandExecutor;
+        this.eventTimeSupplier = eventTimeSupplier;
     }
 
     public void runApplication() {
         for (var input = readLine(); isNotQuit(input); input = readLine()) {
-            var outputMessage = commandExecutor.execute(CommandParser.commandFor(input));
-            writeOutput(outputMessage);
+            var response = commandExecutor.execute(CommandParser.commandFor(input));
+            writeOutput(outputMessageFor(response));
         }
+    }
+
+    private OutputMessage outputMessageFor(final Response response) {
+        return new ConsoleView().outputFor(response, currentTime());
+    }
+
+    private Instant currentTime() {
+        return eventTimeSupplier.get();
     }
 
     private String readLine() {

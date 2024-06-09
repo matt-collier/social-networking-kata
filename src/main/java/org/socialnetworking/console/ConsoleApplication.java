@@ -5,9 +5,12 @@ import org.socialnetworking.Repository;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.function.Supplier;
 
-public class SocialNetworkingApplication {
+public class ConsoleApplication {
 
+
+    private static final Supplier<Instant> TIME_SUPPLIER = () -> Instant.now(Clock.systemUTC());
 
     public static void main(String[] args) {
         try( var consoleReader = new ConsoleReader(System.in);
@@ -16,12 +19,12 @@ public class SocialNetworkingApplication {
             var appRunner = new ApplicationRunner(
                     consoleReader,
                     consoleWriter,
-                    new CommandExecutor(new Repository(), (() -> Instant.now(Clock.systemUTC()))));
+                    new CommandExecutor(new Repository(), TIME_SUPPLIER),
+                    TIME_SUPPLIER);
 
             appRunner.runApplication();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 }

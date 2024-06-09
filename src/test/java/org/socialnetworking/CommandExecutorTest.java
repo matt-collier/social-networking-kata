@@ -2,6 +2,9 @@ package org.socialnetworking;
 
 import org.junit.jupiter.api.Test;
 import org.socialnetworking.domain.Posted;
+import org.socialnetworking.domain.Timeline;
+import org.socialnetworking.domain.VoidResponse;
+import org.socialnetworking.domain.Wall;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -21,8 +24,8 @@ class CommandExecutorTest {
 
     @Test
     void shouldPostMessagesToTimeline() {
-        final var outputMessage = commandExecutor.execute(new PostCommand("Alice", "In wonderland again"));
-        assertThat(outputMessage.lines()).isEmpty();
+        final var response = commandExecutor.execute(new PostCommand("Alice", "In wonderland again"));
+        assertThat(response).isInstanceOf(VoidResponse.class);
         assertThat(repository.fetchTimeline("Alice").messages()).containsExactly("In wonderland again");
     }
 
@@ -30,8 +33,10 @@ class CommandExecutorTest {
     void shouldReadTimeline() {
         repository.addToTimeline(new Posted("Bob", "Hi, Bob here", NOW));
         repository.addToTimeline(new Posted("Bob", "Whats going on?", NOW));
-        final var outputMessage = commandExecutor.execute(new ReadCommand("Bob"));
-        assertThat(outputMessage.lines()).containsExactly("Hi, Bob here", "Whats going on?");
+        final var response = commandExecutor.execute(new ReadCommand("Bob"));
+        assertThat(response).isInstanceOfSatisfying(Timeline.class, timeline -> {
+                    assertThat(timeline.messages()).containsExactly("Hi, Bob here", "Whats going on?");
+                });
     }
 
     @Test
@@ -41,8 +46,12 @@ class CommandExecutorTest {
 
         commandExecutor.execute(new FollowCommand("Charlie", "Alice"));
 
-        final var outputMessage = commandExecutor.execute(new WallCommand("Charlie"));
-        assertThat(outputMessage.lines()).containsExactly("Charlie - I'm in New York today! Anyone wants to have a coffee? (2 seconds ago)", "Alice - I love the weather today (5 minutes ago)");
-
+        final var response = commandExecutor.execute(new WallCommand("Charlie"));
+        assertThat(response).isInstanceOfSatisfying(Wall.class, wall -> {
+            assertThat(wall.postedList())
+                    .containsExactly(new Posted("Charlie",
+                            "I'm in New York today! Anyone wants to have a coffee?", TWO_SECONDS_AGO),
+                            new Posted("Alice", "I love the weather today", FIVE_MINUTES_AGO));
+        });
     }
 }
