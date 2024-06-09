@@ -27,12 +27,14 @@ public class ConsoleView {
         final var difference  = Duration.between(posted.timestamp(), currentTime);
 
         return switch (difference) {
-            case Duration d when d.toDays() > 0 -> d.toDays() + " days ago";
-            case Duration d when d.toHours() > 0 -> d.toHours() + " hours ago";
-            //todo - handle cases where day, hour and seconds are one so text should use the singular
-            case Duration d when d.toMinutes() == 1 -> "1 minute ago";
+            case Duration d when d.toDays() > 1 -> d.toDays() + " days ago";
+            case Duration d when d.toDays() == 1 -> "1 day ago";
+            case Duration d when d.toHours() > 1 -> d.toHours() + " hours ago";
+            case Duration d when d.toHours() == 1 -> "1 hour ago";
             case Duration d when d.toMinutes() > 1 -> d.toMinutes() + " minutes ago";
-            default ->  difference.toSeconds() + " seconds ago";
+            case Duration d when d.toMinutes() == 1 -> "1 minute ago";
+            case Duration d when d.toSeconds() == 1 -> "1 second ago";
+            default -> difference.toSeconds() + " seconds ago";
         };
     }
 }
